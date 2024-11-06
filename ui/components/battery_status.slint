@@ -1,0 +1,160 @@
+// Copyright (C) 2024 OpenTier FZCO
+//
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program. If not, see <https://www.gnu.org/licenses/>.
+
+import { Theme } from "../theme.slint";
+
+export global BatteryGaugeAdapter {
+    in property <float> batteryLevel: 0;
+    in property <bool> isCharging: false;
+    in property <int> estimatedRange: 0;
+    in property <int> timeToFullCharge: 0;
+}
+
+export global BatteryGaugeParam {
+    in property <angle> start-angle: 120deg;
+    in property <angle> end-angle: 60deg;
+    in-out property <int> total-lights: 35;
+    in-out property <int> level: BatteryGaugeAdapter.batteryLevel / 100 * total-lights;
+    in-out property <angle> angle: start-angle;
+    in-out property <length> element-radius: 185px;
+}
+
+component Light {
+    in property <int> index;
+    property <angle> gap: (360deg - (BatteryGaugeParam.start-angle - BatteryGaugeParam.end-angle)) / BatteryGaugeParam.total-lights;
+    property <angle> angle: (index * gap) + BatteryGaugeParam.start-angle;
+    property <bool> light-on: index <= BatteryGaugeParam.level;
+
+    x: BatteryGaugeParam.element-radius * angle.cos();
+    y: BatteryGaugeParam.element-radius * angle.sin();
+    width: 0;
+    height: 0;
+
+    states [
+        light-off when !root.light-on: {
+            blueLed.opacity: 0;
+        }
+        light-on when root.light-on: {
+            blueLed.opacity: 0.6;
+            in {
+                animate blueLed.opacity {
+                    duration: 100ms;
+                    easing: ease-in-sine;
+                }
+            }
+            out {
+                animate blueLed.opacity {
+                    duration: 600ms;
+                    easing: ease-out-sine;
+                }
+            }
+        }
+    ]
+    Rectangle {
+        Image {
+            source: @image-url("assets/light-hole.png");
+        }
+
+        blueLed := Image {
+            source: @image-url("assets/light.png");
+            opacity: 0;
+        }
+    }
+}
+
+export component BatteryGauge inherits Rectangle {
+    in property <bool> isCharging <=> BatteryGaugeAdapter.isCharging;
+    in property <int> estimatedRange <=> BatteryGaugeAdapter.estimatedRange;
+    in property <int> timeToFullCharge <=> BatteryGaugeAdapter.timeToFullCharge;
+
+    preferred-width: 500px;
+    preferred-height: 500px;
+
+    Rectangle {
+        width: 425px;
+        height: 427px;
+        Image {
+            source: @image-url("assets/dial-frame.png");
+        }
+
+        Rectangle {
+            width: 1px;
+            height: 1px;
+            x: 212px;
+            y: 210px;
+
+            Image {
+                source: @image-url("assets/dial-trim.png");
+            }
+
+            lightHolder := Rectangle {
+                x: 0px;
+                y: 2px;
+                for i in BatteryGaugeParam.total-lights + 1: Light {
+                    index: i;
+                }
+            }
+        }
+    }
+
+    VerticalLayout {
+
+        if isCharging: Text {
+            text: "Charging";
+            vertical-alignment: center;
+            horizontal-alignment: center;
+            font-size: 24px;
+        }
+
+        if !isCharging: Text {
+            text: "Range: " + estimatedRange + " km";
+            vertical-alignment: center;
+            horizontal-alignment: center;
+            font-size: 24px;
+        }
+
+        if isCharging: Text {
+            text: "Charging Time: " + timeToFullCharge + " mins";
+            vertical-alignment: center;
+            horizontal-alignment: center;
+            font-size: 24px;
+        }
+    }
+}
+
+export component BatteryProgressBar inherits Rectangle {
+    in-out property <float> value: BatteryGaugeAdapter.batteryLevel;
+    height: 100px;
+    width: 250px;
+    border-radius: root.height / 2;
+
+    private property <color> progress-color: {
+        if (value < 33) {
+            return #ff0000; // Red for low progress (0% - 33%)
+        } else if (value < 66) {
+            return #ffff00; // Yellow for medium progress (34% - 66%)
+        } else {
+            return #00ff00; // Green for high progress (67% - 100%)
+        }
+    }
+    Rectangle {
+        x: 0;
+        height: 100%;
+        // width: self.height + (parent.width - self.height) * max(0, min(1, root.value / 100));
+        width: parent.width * root.value / 100;
+        border-radius: root.height / 10;
+        background: progress-color;
+    }
+}

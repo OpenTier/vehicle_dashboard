@@ -1,0 +1,196 @@
+// Copyright (C) 2024 OpenTier FZCO
+//
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program. If not, see <https://www.gnu.org/licenses/>.
+
+import { BatteryGaugeAdapter } from "battery_status.slint";
+import { Theme } from "../theme.slint";
+
+export global SpeedometerAdapter {
+    in property <int> speed: 0;
+    in property <int> maxSpeed: 120;
+}
+
+export component CircularProgress {
+    width: 545px;
+    height: 545px;
+    in property <float> progress: 0;
+    in property <float> max_value: 100;
+
+    private property <float> normalized_progress: progress / max_value;
+
+    private property <color> progress-color: {
+        if (normalized_progress < 0.33) {
+            return #ff000080; // Red for low progress (0% - 33%)
+        } else if (normalized_progress < 0.66) {
+            return #ffff0060; // Yellow for medium progress (34% - 66%)
+        } else {
+            return #00ff0060; // Green for high progress (67% - 100%)
+        }
+    }
+    path := Path {
+        private property <float> radius: 0.5;
+        // Adjusted the progress property to ensure it doesn't complete a full circle, which can cause rendering issues.
+        private property <angle> progress: clamp(root.normalized_progress * 1turn, 0, 0.99999turn);
+
+        viewbox-width: 1;
+        viewbox-height: 1;
+        width: 100%;
+        height: 100%;
+
+        stroke-width: 32px;
+        stroke: root.progress-color;
+        clip: true; // Ensures the path is clipped and reveals the gradient
+
+        MoveTo {
+            x: 0.5;
+            y: 1.0; // Start from the bottom middle
+        }
+
+        ArcTo {
+            radius-x: path.radius;
+            radius-y: path.radius;
+            x: 0.5 - path.radius * sin(path.progress);
+            y: 0.5 + path.radius * cos(path.progress);
+            sweep: root.normalized_progress > 0;
+            large-arc: root.normalized_progress > 0.5;
+        }
+    }
+}
+
+export component Speedometer inherits Rectangle {
+    width: 619px;
+    height: 619px;
+
+    // Widget input output
+    // Like the target speed set by the user
+    in property <float> init_value:0;
+    in property <float> target_value: SpeedometerAdapter.speed;
+    out property <float> current_value: init_value;
+
+    // 0 is the 12:00' o'clock position
+    in property <angle> start_position: -120.0deg;
+    in property <angle> final_position: 120.0deg;
+
+    // Value parameters
+    // Like the max speed limit
+    in property <float> max_value: SpeedometerAdapter.maxSpeed;
+    // Like the initial speed
+    // Like how how fast the speed changes when the user sets a new speed
+    in property <float> step_size: 2;
+
+    // GUI parameters
+    in property <duration> refresh_rate: 100ms;
+
+    // The current speed displayed
+    private property <float> delta: 0.0;
+    private property <float> increment: 0;
+    private property <angle> rotation_range: Math.abs(final_position - start_position);
+
+    Image {
+        source: @image-url("assets/speedometer/dial_full.svg");
+        preferred-height: 100%;
+        preferred-width: 100%;
+    }
+
+    CircularProgress {
+        progress: BatteryGaugeAdapter.batteryLevel;
+    }
+
+    text-km := Text {
+        font-size: 90px;
+        font-weight: 255;
+        y: 280px;
+        text: current_value;
+        color: Theme.ot-white;
+    }
+
+    Text {
+        font-size: 20px;
+        y: 415px;
+        text: "km/h";
+        color: Theme.ot-white;
+    }
+
+    text := Text {
+        text: round(BatteryGaugeAdapter.estimatedRange);
+        x: (parent.width / 2 - self.width / 2);
+        y: 475px;
+        color: Theme.ot-white;
+        font-size: 32px;
+    }
+
+    Text {
+        text: " km";
+        font-size: 12px;
+        x: text.x + text.width;
+        y: text.y + self.height;
+        color: Theme.ot-white;
+    }
+
+    // Needle
+    Image {
+        source: @image-url("assets/speedometer/needle.svg");
+        width: 12px;
+        height: 180px;
+
+        // Position the needle so that its pivot point aligns with the speedometer's center
+        x: (parent.width / 2 - self.width / 2);
+        y: (parent.height / 2 - self.height + 20px); // Adjust position
+
+        // Rotation around pivot
+        rotation-origin-x: self.width / 2;
+        rotation-origin-y: self.height - 20px;
+
+        // Rotate the needle based on the normalized value
+        rotation-angle: (start_position) + (current_value / max_value) * rotation_range;
+
+        // Animate the rotation
+        animate rotation-angle {
+            duration: refresh_rate - refresh_rate * 0.1;
+            easing: ease-in-out-bounce;
+        }
+    }
+
+    // Timer to update current_value towards target_value to easen the transition
+    Timer {
+        // Run when values are not equal
+        running: current_value != target_value;
+        interval: refresh_rate;
+        property <float> adjusted_target;
+
+            // Update current_value incrementally on each timeout
+            triggered() => {
+            adjusted_target = target_value;
+            if (target_value > max_value) {
+                adjusted_target = max_value;
+            } else if (target_value < 0) {
+                adjusted_target = 0;
+            }
+            delta = adjusted_target - current_value;
+            if (Math.abs(delta) < step_size) {
+                current_value = adjusted_target;
+            } else {
+                    // There is no Math.sign() in SLint, so we have to do it ourselves
+                    if (delta < 0) {
+                    increment = -1 * step_size;
+                } else if (delta > 0) {
+                    increment = 1 * step_size;
+                } else {
+                    increment = 0;
+                }
+                current_value += increment;
+            }
+        }
+    }
+}

@@ -1,0 +1,102 @@
+// Copyright (C) 2024 OpenTier FZCO
+//
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program. If not, see <https://www.gnu.org/licenses/>.
+
+import { Page } from "./page.slint";
+import { BatteryProgressBar } from "../components/battery_status.slint";
+import { ConnectivityStatus } from "../components/connectivity_status.slint";
+import { AmbientTemperatureLocked } from "../components/ambient_temperature.slint";
+import { CourrierNotifications } from "../components/left_widget.slint";
+import { Theme } from "../theme.slint";
+
+export component LockScreen inherits Page {
+    height: 100%;
+    width: 100%;
+
+    in property <bool> locked: true;
+
+    states [
+        disabled when !locked: {
+            left_bracket.x: 0 - left-bracket.width;
+            right_bracket.x: self.width;
+            opacity: 0;
+            in {
+                animate left_bracket.x, right-bracket.x, opacity {
+                    easing: ease-out;
+                    duration: 700ms;
+                }
+            }
+            out {
+                animate left_bracket.x, right-bracket.x, opacity {
+                    easing: ease-in;
+                    duration: 700ms;
+                }
+            }
+        }
+        enabled when locked: {
+            left_bracket.x: self.width / 2 - 200px;
+            right_bracket.x: self.width / 2 + 200px - right-bracket.width;
+            opacity: 1;
+            in {
+                animate left_bracket.x, right-bracket.x, opacity {
+                    easing: ease-in;
+                    duration: 700ms;
+                }
+            }
+            out {
+                animate left_bracket.x, right-bracket.x, opacity {
+                    easing: ease-out;
+                    duration: 700ms;
+                }
+            }
+        }
+    ]
+
+    left_bracket := Image {
+        source: @image-url("../components/assets/lock_screen/bracket_left.svg");
+        // x: parent.width / 2 - 200px;
+        vertical-alignment: center;
+    }
+
+    right_bracket := Image {
+        source: @image-url("../components/assets/lock_screen/bracket_right.svg");
+        // x: parent.width / 2 + 200px - self.width;
+        vertical-alignment: center;
+    }
+
+    ConnectivityStatus {
+        height: 100px;
+        width: 100px;
+        y: 20px;
+    }
+
+    AmbientTemperatureLocked {
+        y: 90px;
+    }
+
+    progressbar := BatteryProgressBar { }
+
+    button_text := Text {
+        text: progressbar.value + "%";
+        y: progressbar.y + progressbar.height + 20px;
+        font-size: 20px;
+        vertical-alignment: center;
+        color: Theme.ot-white;
+    }
+
+    Image {
+        source: @image-url("../components/assets/lock_screen/locked_button.svg");
+        y: parent.height - 100px;
+    }
+}

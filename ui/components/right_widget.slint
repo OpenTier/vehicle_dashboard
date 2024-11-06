@@ -1,0 +1,76 @@
+// Copyright (C) 2024 OpenTier FZCO
+//
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program. If not, see <https://www.gnu.org/licenses/>.
+
+import { Theme } from "../theme.slint";
+
+export global TripDataAdapter {
+    in property <string> name: "Trip A";
+    in property <float> sinceStart: 0;
+    in property <float> distance: 0;
+    in property <float> averageSpeed: 0;
+    in property <string> time: "";
+}
+
+export component TripData inherits Window {
+    in property <string> name <=> TripDataAdapter.name;
+    in property <float> distance <=> TripDataAdapter.distance;
+    in property <float> sinceStart <=> TripDataAdapter.sinceStart;
+    in property <float> averageSpeed <=> TripDataAdapter.averageSpeed;
+    in property <string> totalTime <=> TripDataAdapter.time;
+
+    Image {
+        source: @image-url("assets/card.svg");
+        height: 100%;
+        width: 100%;
+    }
+
+    Text {
+        text: name;
+        y: 50px;
+        font-size: 18px;
+        horizontal-alignment: center;
+        color: Theme.ot-white;
+    }
+
+    VerticalLayout {
+        alignment: center;
+        padding-left: 50px;
+        spacing: 10px;
+
+        Text {
+            text: "Total: " + distance.round() + " km";
+            font-size: 15px;
+            color: Theme.ot-white;
+        }
+
+        Text {
+            text: "Since start: " + sinceStart.round() + " km";
+            font-size: 15px;
+            color: Theme.ot-white;
+        }
+
+        Text {
+            text: "Average: " + averageSpeed.round() + " km/h";
+            font-size: 15px;
+            color: Theme.ot-white;
+        }
+
+        Text {
+            text: "Duration: " + totalTime;
+            font-size: 15px;
+            color: Theme.ot-white;
+        }
+    }
+}

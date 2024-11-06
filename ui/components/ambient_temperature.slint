@@ -1,0 +1,134 @@
+// Copyright (C) 2024 OpenTier FZCO
+//
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program. If not, see <https://www.gnu.org/licenses/>.
+
+import { Theme } from "../theme.slint";
+import { ConnectivityStatus } from "connectivity_status.slint";
+
+export global ConnectivityStatusAdapter {
+    in property <bool> isConnected: true;
+}
+
+export global AmbientTemperatureAdapter {
+    in property <int> temperature: 0;
+}
+
+export global TimeDateAdapter {
+    in property <string> date: "Sunday 8th, January 2023";
+    in property <string> time: "5:20";
+    in property <string> time-suffix: "PM";
+}
+
+export global Images {
+    in property <image> sunny: @image-url("assets/weather/sunny.svg");
+    in property <image> cloud: @image-url("assets/weather/cloud.svg");
+    in property <image> cloudy: @image-url("assets/weather/cloudy.svg");
+    in property <image> rainy: @image-url("assets/weather/rainy.svg");
+}
+
+export component AmbientTemperatureLocked {
+    in property <image> weather-icon: Images.cloud;
+    in property <int> temperature: AmbientTemperatureAdapter.temperature;
+    in property <string> date: TimeDateAdapter.date;
+    in property <string> time: TimeDateAdapter.time;
+    in property <string> description: "Very cloudy";
+
+    VerticalLayout {
+        padding: 5px;
+        spacing: 5px;
+        alignment: center;
+        HorizontalLayout {
+            alignment: space-around;
+            Text {
+                text: temperature + "°C";
+                font-size: 30px;
+                horizontal-alignment: center;
+                vertical-alignment: center;
+                color: Theme.ot-white;
+            }
+
+            Image {
+                source: weather-icon;
+                height: 30px;
+                horizontal-alignment: center;
+            }
+        }
+
+        HorizontalLayout {
+            alignment: center;
+            Text {
+                text: date;
+                horizontal-alignment: center;
+                font-size: 15px;
+                color: Theme.ot-white;
+            }
+        }
+
+        HorizontalLayout {
+            alignment: center;
+            Text {
+                text: TimeDateAdapter.time + " " + TimeDateAdapter.time-suffix;
+                horizontal-alignment: center;
+                font-size: 15px;
+                color: Theme.ot-white;
+            }
+        }
+    }
+}
+
+export component AmbientTemperatureUnlocked {
+    in property <int> temperature: AmbientTemperatureAdapter.temperature;
+    in property <string> date: TimeDateAdapter.date;
+
+    height: 25px;
+    padding: 15px;
+    width: 80%;
+
+    HorizontalLayout {
+        alignment: space-between;
+        Rectangle {
+            padding: 20px;
+            HorizontalLayout {
+                spacing: 10px;
+                alignment: start;
+                Text {
+                    text: temperature + "°C";
+                    font-size: 15px;
+                }
+
+                Text {
+                    text: date;
+                    font-size: 15px;
+                }
+            }
+        }
+
+        Rectangle {
+            padding: 20px;
+            HorizontalLayout {
+                spacing: 10px;
+                alignment: end;
+                Text {
+                    text: TimeDateAdapter.time + " " + TimeDateAdapter.time-suffix;
+                    font-size: 15px;
+                }
+
+                ConnectivityStatus {
+                    height: 15px;
+                    width: 15px;
+                }
+            }
+        }
+    }
+}
