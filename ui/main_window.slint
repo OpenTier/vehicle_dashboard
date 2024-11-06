@@ -1,0 +1,54 @@
+
+// Copyright (C) 2024 OpenTier FZCO
+//
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program. If not, see <https://www.gnu.org/licenses/>.
+
+import { Dashboard } from "pages/dashboard.slint";
+import { LockScreen } from "pages/lock_screen.slint";
+import { Theme } from "theme.slint";
+
+import { TimeDateAdapter } from "components/ambient_temperature.slint";
+import { StateAdapter } from "components/state_adapter.slint";
+import { AmbientTemperatureAdapter } from "components/ambient_temperature.slint";
+import { BatteryGaugeAdapter } from "components/battery_status.slint";
+import { ConnectivityStatusAdapter } from "components/connectivity_status.slint";
+import { SpeedometerAdapter } from "components/speedometer.slint";
+import { TripDataAdapter } from "components/right_widget.slint";
+import { TellTalesAdapter } from "components/telltales.slint";
+import { CourrierNotificationsAdpater } from "components/left_widget.slint";
+import { Button } from "std-widgets.slint";
+
+export { TimeDateAdapter, StateAdapter, AmbientTemperatureAdapter, BatteryGaugeAdapter, ConnectivityStatusAdapter, SpeedometerAdapter, TripDataAdapter, TellTalesAdapter, CourrierNotificationsAdpater }
+
+export component MainWindow inherits Window {
+    in property <bool> isLocked <=> StateAdapter.isLocked;
+    height: 600px;
+    width: 1024px;
+
+    title: "Vehicle Dashboard";
+    default-font-family: "Orbitron";
+    no-frame: true;
+
+    Image {
+        source: @image-url("components/assets/background_color_fill.svg");
+    }
+
+    Dashboard {
+        unlocked: !isLocked;
+    }
+
+    LockScreen {
+        locked: isLocked;
+    }
+}

@@ -1,0 +1,23 @@
+[package]
+name = "vehicle-dashboard"
+version = "0.1.0"
+edition = "2021"
+build = "build.rs"
+
+[dependencies]
+tokio = { version = "1.40.0", default-features = false }
+zenoh = { version = "1.0.0" }
+clap = { version = "4.5.17", features = ["derive"] }
+log = { version = "0.4.22" }
+env_logger = { version = "0.11.5" }
+prost = "0.13.2"
+prost-types = "0.13.2"
+slint = "1.7.2"
+chrono = "0.4.38"
+
+[target.'cfg(any(target_arch = "arm", target_arch = "aarch64"))'.dependencies]
+rppal = "0.19.0"
+
+[build-dependencies]
+slint-build = "1.7.2"
+prost-build = "0.13.2"

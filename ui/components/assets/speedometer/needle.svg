@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg width="3.5277278mm" height="63.499992mm" viewBox="0 0 3.5277278 63.499992" version="1.1" id="svg1"
+   xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg">
+   <defs id="defs1">
+      <linearGradient id="paint6_linear_68_289" x1="383.767" y1="200.505" x2="417.69199" y2="195.68401"
+         gradientUnits="userSpaceOnUse"
+         gradientTransform="matrix(0.53447022,1.0125381,-0.70020113,0.7747104,-7.2898343,-455.31786)">
+         <stop stop-color="#2AF39F" id="stop158" offset="0" />
+         <stop offset="0.61702132" stop-color="#2C2D3F" stop-opacity="0.5" id="stop159"
+            style="stop-color:#2c2d3f;stop-opacity:0;" />
+      </linearGradient>
+   </defs>
+   <g id="layer1" transform="translate(-53.878053,-89.997022)">
+      <path
+         d="m 57.401782,92.546685 -4.65e-4,-2.549663 -3.523263,0.0073 4.65e-4,2.549663 z m 0.004,60.943075 -0.004,-60.943075 -3.523266,0.0073 0.004,60.943025 z"
+         fill="url(#paint6_linear_68_289)" id="path92"
+         style="fill:url(#paint6_linear_68_289);stroke:none;stroke-width:1.05974" />
+   </g>
+</svg>

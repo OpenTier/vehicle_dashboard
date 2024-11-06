@@ -1,0 +1,106 @@
+// Copyright (C) 2024 OpenTier FZCO
+//
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program. If not, see <https://www.gnu.org/licenses/>.
+
+import { Page } from "./page.slint";
+import { BatteryGauge } from "../components/battery_status.slint";
+import { Speedometer } from "../components/speedometer.slint";
+import { LightTellTales, ControlTellTales, LeftSignal, RightSignal } from "../components/telltales.slint";
+import { TripData } from "../components/right_widget.slint";
+import { AmbientTemperatureUnlocked } from "../components/ambient_temperature.slint";
+import { ConnectivityStatus } from "../components/connectivity_status.slint";
+import { GridBox } from "std-widgets.slint";
+import { CourrierNotifications } from "../components/left_widget.slint";
+
+export component Dashboard inherits Page {
+    height: 100%;
+    width: 100%;
+
+    in property <bool> unlocked: true;
+
+    states [
+        disabled when !unlocked: {
+            opacity: 0;
+            in {
+                animate opacity {
+                    easing: ease-in;
+                    duration: 400ms;
+                }
+            }
+            out {
+                animate opacity {
+                    easing: ease-out;
+                    duration: 400ms;
+                }
+            }
+        }
+        enabled when unlocked: {
+            opacity: 1;
+            in {
+                animate opacity {
+                    easing: ease-in;
+                    duration: 400ms;
+                }
+            }
+            out {
+                animate opacity {
+                    easing: ease-out;
+                    duration: 400ms;
+                }
+            }
+        }
+    ]
+
+    Image {
+        source: @image-url("../components/assets/corners.svg");
+    }
+
+    CourrierNotifications {
+        x: parent.width / 7 - self.width / 2;
+        y: parent.height / 2 - self.height / 2;
+    }
+
+    TripData {
+        x: parent.width * 6 / 7 - self.width / 2;
+        y: parent.height / 2 - self.height / 2;
+    }
+
+    Speedometer {
+        x: parent.width / 2 - self.width / 2;
+        y: parent.height / 2 - self.height / 2;
+    }
+
+    Rectangle {
+        y: 250px;
+
+        HorizontalLayout {
+            alignment: space-between;
+            padding: 20px;
+
+            ControlTellTales { }
+
+            LightTellTales { }
+        }
+    }
+
+    LeftSignal {
+        x: 10px;
+        y: 35px;
+    }
+
+    RightSignal {
+        x: 900px;
+        y: 35px;
+    }
+}

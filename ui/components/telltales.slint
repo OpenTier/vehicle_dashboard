@@ -1,0 +1,99 @@
+// Copyright (C) 2024 OpenTier FZCO
+//
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program. If not, see <https://www.gnu.org/licenses/>.
+
+export global TellTalesAdapter {
+    in property <bool> fog: false;
+    in property <bool> highbeam: false;
+    in property <bool> bendbeam: false;
+    in property <bool> park: false;
+    in property <bool> brake: false;
+    in property <bool> tire: false;
+    in property <bool> left_signal: false;
+    in property <bool> right_signal: false;
+}
+
+export component LightTellTales inherits Window {
+    in property <bool> fog <=> TellTalesAdapter.fog;
+    in property <bool> high-beam <=> TellTalesAdapter.highbeam;
+    in property <bool> bend-beam <=> TellTalesAdapter.bendbeam;
+
+    HorizontalLayout {
+        padding: 20px;
+        spacing: 10px;
+
+        Image {
+            source: @image-url("assets/telltales/fog.svg");
+            visible: fog;
+        }
+
+        Image {
+            source: @image-url("assets/telltales/high_beam.svg");
+            visible: high-beam;
+        }
+
+        Image {
+            source: @image-url("assets/telltales/bend_beam.svg");
+            visible: bend-beam;
+        }
+    }
+}
+
+export component ControlTellTales inherits Window {
+    in property <bool> park <=> TellTalesAdapter.park;
+    in property <bool> brake <=> TellTalesAdapter.brake;
+    in property <bool> tire <=> TellTalesAdapter.tire;
+
+    HorizontalLayout {
+        padding: 20px;
+        spacing: 10px;
+
+        Image {
+            source: @image-url("assets/telltales/park.svg");
+            visible: park;
+        }
+
+        Image {
+            source: @image-url("assets/telltales/brake.svg");
+            visible: brake;
+        }
+
+        Image {
+            source: @image-url("assets/telltales/tire.svg");
+            visible: tire;
+        }
+    }
+}
+
+export component LeftSignal inherits Window {
+    in property <bool> left-signal <=> TellTalesAdapter.left_signal;
+
+    Image {
+        source: @image-url("assets/telltales/left_signal.svg");
+        height: 50px;
+        width: 50px;
+        visible: left-signal;
+    }
+}
+
+export component RightSignal inherits Window {
+    in property <bool> right-signal <=> TellTalesAdapter.right_signal;
+
+    Image {
+        source: @image-url("assets/telltales/right_signal.svg");
+        height: 50px;
+        width: 50px;
+        visible: right-signal;
+    }
+}

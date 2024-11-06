@@ -1,0 +1,21 @@
+{
+    "name": "Vehicle Dashboard Dev Container",
+    "image": "mcr.microsoft.com/devcontainers/rust:latest",
+    "runArgs": [
+        "-v",
+        "/tmp/.X11-unix:/tmp/.X11-unix"
+    ],
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "Slint.slint",
+                "rust-lang.rust-analyzer",
+                "pbkit.vscode-pbkit"
+            ]
+        }
+    },
+    "forwardPorts": [],
+    "remoteEnv": {
+        "DISPLAY": "${localEnv:DISPLAY}"
+    }
+}
